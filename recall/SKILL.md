@@ -20,9 +20,9 @@ Retrieval keeps what teaching locked in. One card per turn, free response, grade
 Read before the first card:
 
 1. [../teach/references/recall.md](../teach/references/recall.md) — **the whole protocol**: deck format, schedule, when to offer, running a round.
-2. [../teach/references/learner-files.md](../teach/references/learner-files.md) — finding the learner root, and the display-log rules.
+2. [../teach/references/learner-files.md](../teach/references/learner-files.md) — finding the learner root, and the live lesson page rules.
 3. [../teach/references/lock-in-response.md](../teach/references/lock-in-response.md) — prompt-writing rules and the grading table.
-4. `.alvar/LEARNER.md` (voice, assessed-work rule, display log) and `~/.alvar/settings.md` (recall settings).
+4. `.alvar/LEARNER.md` (voice, assessed-work rule, live lesson page) and `~/.alvar/settings.md` (recall settings).
 
 ## What to do
 

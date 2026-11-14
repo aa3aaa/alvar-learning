@@ -5,9 +5,9 @@ Use this protocol after each teaching node. Diagnostic probes remain multiple ch
 ## Present the check
 
 1. Teach exactly one reasoning step.
-2. Update the configured display log with one complete, unbiased prompt that tests only that step.
+2. Update the live lesson page (if `LEARNER.md` names one) with one complete, unbiased prompt that tests only that step, plus fill-in fields where the answer is a table, blanks or code ([learner-files.md](learner-files.md)).
 3. Give no options, answer bank, leading scaffold, or partially completed derivation.
-4. In the conversation, say only that the lock-in is ready on the display surface and invite the learner to reply with their work or `I don't know`. Do not repeat the mathematical prompt in chat when the display log is configured.
+4. In the conversation, say only that the lock-in is ready on the page and invite the learner to answer there or in the chat, with their work or `I don't know`. Do not repeat the prompt in chat when the page is configured.
 5. Stop and wait for the learner's next normal chat message. Do not open the quiz picker.
 
 Use the course's notation and require only the evidence the node needs:
@@ -56,4 +56,4 @@ Record in `.alvar/sessions/<date>-<slug>.md`:
 - grading evidence
 - result: `lock-in` | `retry` | `insert-prereq`
 
-Update the topic map with the resulting `known`, `edge`, `unknown`, or `blocked` evidence. When the result is `lock-in`, or the node ends taught-not-verified, add the node's card to `.alvar/recall.md` ([recall.md](recall.md), "Making cards"). Then update the display log with the concise verdict, correction if needed, and next route before teaching anything else.
+Update the topic map with the resulting `known`, `edge`, `unknown`, or `blocked` evidence. When the result is `lock-in`, or the node ends taught-not-verified, add the node's card to `.alvar/recall.md` ([recall.md](recall.md), "Making cards"). Then update the live lesson page with the concise verdict, correction if needed, and next route before teaching anything else.

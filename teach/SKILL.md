@@ -41,6 +41,7 @@ If `probe`, `learn-visual`, `learn-verify`, or `recall` are installed, use them 
 - Do not invent citations. Verify or mark uncertainty.
 - Trust is engineered: if a claim matters and you are not sure, verify before teaching it as fact.
 - Never teach a claim the Verifier marked `contradicted` or `unknown` as fact.
+- **Assessed work:** if `LEARNER.md` (or the course's rules) restricts help on labs, assignments or exams, follow it. Teach from lecture/tutorial material, textbooks and docs; never read, solve or produce a graded deliverable.
 
 ## Turn 0
 
@@ -56,7 +57,7 @@ If `probe`, `learn-visual`, `learn-verify`, or `recall` are installed, use them 
 
 During the initial probe, call the harness quiz UI in [references/quiz-ui.md](references/quiz-ui.md). Do not paste diagnostic choices in chat.
 
-After teaching a node, follow [references/lock-in-response.md](references/lock-in-response.md): put one unbiased free-response prompt on the learner's display surface, invite the learner to answer in the normal conversation input, and stop. Do not open a multiple-choice picker for a teaching lock-in.
+After teaching a node, follow [references/lock-in-response.md](references/lock-in-response.md): put one unbiased free-response prompt on the live lesson page if `LEARNER.md` names one (with fill-in fields where the answer is a table, blanks or code), otherwise in the chat; invite the learner to answer, and stop. Do not open a multiple-choice picker for a teaching lock-in.
 
 When the learner replies, grade the method and justification, update the map and session file, and then choose the next node, a retry, or an inserted prerequisite. When a node locks in, add its recall card to `.alvar/recall.md` ([references/recall.md](references/recall.md), "Making cards").
 
@@ -70,4 +71,4 @@ If they are **confused** about the concept ("explain this further", "I don't und
 
 ## Done for now
 
-Write what locked, what is still `edge`, and the next node. Check that every node locked this session has its recall card, and tell the learner how many cards were added and when the first ones are due. Leave the session file in a state another agent can resume. Then run **Scribe** to write the `## Resume here` block, and show the learner any `LEARNER.md` rules it proposes.
+Write what locked, what is still `edge`, and the next node. Check that every node locked this session has its recall card, and tell the learner how many cards were added and when the first ones are due. Leave the session file in a state another agent can resume, and write a stopping screen to the live lesson page (`stage: "paused"`, what locked, the next step, the last result). Then run **Scribe** to write the `## Resume here` block, and show the learner any `LEARNER.md` rules it proposes.

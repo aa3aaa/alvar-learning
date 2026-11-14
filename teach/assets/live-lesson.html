@@ -1,0 +1,528 @@
+<title>{{TITLE}}</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one reading column under a sticky header. The page is a screen, not a log:
+   Claude rewrites live/screen each turn and the column always shows only the current step,
+   your check (with fill-in fields), and the last result. */
+:root {
+  --paper: #f5f7fa;
+  --sheet: #ffffff;
+  --ink: #18212d;
+  --muted: #5a6577;
+  --rule: #d9dfe7;
+  --accent: #2452d1;
+  --accent-soft: #e6ecfb;
+  --current: #f3b62f;
+  --current-ink: #3d2c00;
+  --good: #1d7a4b;
+  --warn: #9a6200;
+  --bad: #b3322e;
+  --code-bg: #eef1f6;
+  --field-bg: #fbfcfe;
+  --field-line: #c9d2de;
+  --hl-key: #a42a7f;
+  --hl-str: #1d7a4b;
+  --hl-num: #9a4f00;
+  --hl-com: #6b7686;
+  --hl-type: #2452d1;
+  --font-ui: "Schibsted Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-read: "Source Serif 4", "Iowan Old Style", Georgia, serif;
+  --font-code: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0f141b; --sheet: #161d27; --ink: #e5e9ef; --muted: #98a3b3; --rule: #2a3442;
+    --accent: #84a6ff; --accent-soft: #1d2840; --current: #e0a93a; --current-ink: #241900;
+    --good: #5cc48e; --warn: #e0a93a; --bad: #f07a74; --code-bg: #1b2330; --field-bg: #121922; --field-line: #344155;
+    --hl-key: #e88ccf; --hl-str: #7fd3a3; --hl-num: #f0b46c; --hl-com: #7f8a9a; --hl-type: #93b1ff;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0f141b; --sheet: #161d27; --ink: #e5e9ef; --muted: #98a3b3; --rule: #2a3442;
+  --accent: #84a6ff; --accent-soft: #1d2840; --current: #e0a93a; --current-ink: #241900;
+  --good: #5cc48e; --warn: #e0a93a; --bad: #f07a74; --code-bg: #1b2330; --field-bg: #121922; --field-line: #344155;
+  --hl-key: #e88ccf; --hl-str: #7fd3a3; --hl-num: #f0b46c; --hl-com: #7f8a9a; --hl-type: #93b1ff;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--paper); color: var(--ink); font-family: var(--font-read); font-size: 17px; line-height: 1.6; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--sheet); }
+
+.bar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  background: var(--sheet); border-bottom: 1px solid var(--rule);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 12px 10px; font-family: var(--font-ui);
+}
+.bar-inner { max-width: 780px; margin: 0 auto; display: grid; gap: 6px; }
+.bar-top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+.topic { font-weight: 700; color: var(--ink); letter-spacing: .02em; }
+.chip { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 2px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+.chip[data-stage="recall"] { background: color-mix(in srgb, var(--current) 22%, transparent); color: var(--warn); }
+.chip[data-stage="paused"] { background: var(--code-bg); color: var(--muted); }
+.updated { margin-left: auto; font-variant-numeric: tabular-nums; }
+.updated[data-live="off"]::before { content: "● "; color: var(--bad); }
+.updated[data-live="on"]::before { content: "● "; color: var(--good); }
+h1.heading { margin: 0; font-family: var(--font-ui); font-size: clamp(20px, 3.4vw, 26px); line-height: 1.25; font-weight: 700; text-wrap: balance; }
+.progress { height: 4px; background: var(--rule); border-radius: 2px; overflow: hidden; }
+.progress > span { display: block; height: 100%; background: var(--accent); transition: width .3s ease; }
+
+main {
+  max-width: 780px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 64px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px;
+}
+main > * { min-width: 0; }
+.goal { font-family: var(--font-ui); font-size: 14px; color: var(--muted); margin: 0; }
+
+details.plan { border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet); }
+details.plan > summary { cursor: pointer; padding: 10px 14px; font-family: var(--font-ui); font-size: 13px; font-weight: 600; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; }
+details.plan > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.plan-graph { overflow-x: auto; padding: 4px 14px 8px; text-align: center; }
+.plan-graph svg { max-width: 100%; height: auto; }
+.plan-legend { font-family: var(--font-ui); font-size: 13px; color: var(--muted); padding: 0 14px 12px; margin: 0; }
+
+section.block { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+.label { font-family: var(--font-ui); font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 0; }
+.block h2 { font-family: var(--font-ui); font-size: 21px; line-height: 1.3; margin: 0; text-wrap: balance; }
+.block[data-kind="asked"] { border-left: 3px solid var(--accent); padding-left: 14px; }
+.block[data-kind="warning"], .block[data-kind="correction"] { border: 1px solid color-mix(in srgb, var(--bad) 45%, var(--rule)); background: color-mix(in srgb, var(--bad) 7%, var(--sheet)); border-radius: 8px; padding: 12px 16px; }
+.block[data-kind="note"] { border: 1px solid var(--rule); background: var(--sheet); border-radius: 8px; padding: 12px 16px; }
+
+.md > :first-child { margin-top: 0; }
+.md > :last-child { margin-bottom: 0; }
+.md p, .md ul, .md ol { margin: 0 0 .8em; max-width: 68ch; }
+.md li + li { margin-top: .25em; }
+.md h3, .md h4 { font-family: var(--font-ui); margin: 1.2em 0 .4em; line-height: 1.3; }
+.md h3 { font-size: 17px; } .md h4 { font-size: 15px; }
+.md a { color: var(--accent); }
+.md blockquote { margin: 0 0 .8em; padding: 6px 14px; border-left: 3px solid var(--rule); color: var(--muted); }
+.md code { font-family: var(--font-code); font-size: .84em; background: var(--code-bg); padding: .1em .35em; border-radius: 4px; }
+.md pre { margin: 0 0 .9em; background: var(--code-bg); border-radius: 8px; padding: 12px 14px; overflow-x: auto; line-height: 1.5; }
+.md pre code { background: none; padding: 0; font-size: 13.5px; }
+.md hr { border: 0; border-top: 1px solid var(--rule); margin: 1.2em 0; }
+.table-wrap { overflow-x: auto; margin: 0 0 .9em; }
+.md table, table.fill { border-collapse: collapse; font-size: 15px; min-width: 100%; }
+.md th, .md td, table.fill th, table.fill td { border: 1px solid var(--rule); padding: 6px 10px; text-align: left; vertical-align: top; }
+.md th, table.fill th { font-family: var(--font-ui); font-size: 12.5px; letter-spacing: .03em; background: var(--code-bg); }
+.md math[display="block"] { margin: .6em 0; overflow-x: auto; }
+.svg-figure { background: var(--sheet); border: 1px solid var(--rule); border-radius: 8px; padding: 12px; overflow-x: auto; }
+.svg-figure svg { max-width: 100%; height: auto; }
+
+.hljs-keyword, .hljs-built_in, .hljs-meta .hljs-keyword { color: var(--hl-key); }
+.hljs-string, .hljs-char { color: var(--hl-str); }
+.hljs-number, .hljs-literal { color: var(--hl-num); }
+.hljs-comment { color: var(--hl-com); font-style: italic; }
+.hljs-type, .hljs-title, .hljs-title.class_, .hljs-title.function_ { color: var(--hl-type); }
+.hljs-meta { color: var(--hl-com); }
+
+/* The check: an answer booklet, the one card-styled block on the page. */
+.check { background: var(--sheet); border: 1.5px solid var(--accent); border-radius: 10px; padding: 16px 18px 18px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+.check > * { min-width: 0; }
+.check h2 { font-family: var(--font-ui); font-size: 20px; margin: 0; }
+.check-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.check-head .label { color: var(--accent); }
+.field { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; min-width: 0; }
+.field > label { font-family: var(--font-ui); font-size: 13px; font-weight: 600; color: var(--muted); }
+textarea.answer, table.fill input {
+  width: 100%; font: inherit; color: var(--ink); background: var(--field-bg);
+  border: 1px solid var(--field-line); border-radius: 6px;
+}
+textarea.answer {
+  padding: 8px 10px; resize: vertical; line-height: 28px; min-height: 92px;
+  background-image: linear-gradient(to bottom, transparent 27px, color-mix(in srgb, var(--field-line) 55%, transparent) 27px);
+  background-size: 100% 28px; background-attachment: local; background-position: 0 8px;
+}
+textarea.answer.code { font-family: var(--font-code); font-size: 13.5px; line-height: 21px; background-image: none; tab-size: 4; white-space: pre; overflow-x: auto; }
+table.fill td.editable { padding: 3px; background: var(--field-bg); }
+table.fill input { border-color: transparent; padding: 5px 7px; font-size: 15px; }
+table.fill { width: 100%; }
+table.fill td.given { min-width: 12em; }
+table.fill td.editable { min-width: 10em; }
+textarea.answer:focus-visible, table.fill input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
+.check-foot { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; font-family: var(--font-ui); font-size: 13.5px; }
+button.done {
+  font: 600 14px var(--font-ui); color: #fff; background: var(--accent); border: 0; border-radius: 6px; padding: 9px 16px; cursor: pointer;
+}
+:root[data-theme="dark"] button.done { color: #0b1222; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) button.done { color: #0b1222; } }
+button.done:hover { filter: brightness(1.08); }
+button.done:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button.done[disabled] { opacity: .55; cursor: default; }
+.save-state { color: var(--muted); }
+.save-state[data-state="done"] { color: var(--good); font-weight: 600; }
+.save-state[data-state="error"] { color: var(--bad); }
+.chat-note { font-family: var(--font-ui); font-size: 14px; color: var(--muted); margin: 0; }
+
+details.result { border-top: 2px solid var(--rule); padding-top: 14px; }
+details.result > summary { cursor: pointer; list-style: none; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+details.result > summary::-webkit-details-marker { display: none; }
+details.result > summary::before { content: "▸"; color: var(--muted); font-family: var(--font-ui); transition: transform .15s; }
+details.result[open] > summary::before { transform: rotate(90deg); }
+details.result > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+details.result h2 { font-family: var(--font-ui); font-size: 18px; margin: 0; }
+details.result .md { margin-top: 12px; }
+
+.empty { background: var(--sheet); border: 1px dashed var(--rule); border-radius: 10px; padding: 22px; font-family: var(--font-ui); display: grid; gap: 8px; }
+.empty h2 { margin: 0; font-size: 19px; }
+.empty p { margin: 0; color: var(--muted); max-width: 60ch; }
+
+@media (max-width: 480px) {
+  body { font-size: 16px; }
+  .updated { margin-left: 0; width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<header class="bar">
+  <div class="bar-inner">
+    <div class="bar-top">
+      <span class="topic" id="topic">Live lesson</span>
+      <span class="chip" id="stage" hidden></span>
+      <span class="updated" id="updated" data-live="off">Connecting…</span>
+    </div>
+    <h1 class="heading" id="heading">Waiting for Claude</h1>
+    <div class="progress" id="progress" hidden><span id="progress-fill" style="width:0%"></span></div>
+  </div>
+</header>
+
+<main id="main">
+  <div class="empty" id="empty">
+    <h2>Nothing on screen yet</h2>
+    <p>This page shows the step you're on, your check and the last result. Claude rewrites it every turn, so it never needs scrolling. Start or continue a lesson in Claude and it fills in here.</p>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+<script>
+(function () {
+  "use strict";
+  const $ = (id) => document.getElementById(id);
+  const main = $("main");
+  let db = null;
+  let screen = null;          // last live/screen body
+  let answers = {};           // field values for the current check
+  let answerStatus = "draft";
+  let checkId = null;
+  let saveTimer = null, saving = false, saveAgain = false;
+  let lastUpdated = null;
+
+  // ---------- markdown, with $math$ (MathML, no fonts needed) ----------
+  const mathExt = {
+    extensions: [
+      { name: "mathBlock", level: "block",
+        start(src) { const i = src.indexOf("$$"); return i < 0 ? undefined : i; },
+        tokenizer(src) { const m = /^\$\$([\s\S]+?)\$\$(?:\n|$)/.exec(src); if (m) return { type: "mathBlock", raw: m[0], text: m[1].trim() }; },
+        renderer(t) { return katexHtml(t.text, true); } },
+      { name: "mathInline", level: "inline",
+        start(src) { const i = src.indexOf("$"); return i < 0 ? undefined : i; },
+        tokenizer(src) { const m = /^\$(?!\s)((?:\\\$|[^$\n])+?)(?<!\s)\$(?!\d)/.exec(src); if (m) return { type: "mathInline", raw: m[0], text: m[1] }; },
+        renderer(t) { return katexHtml(t.text, false); } },
+    ],
+  };
+  function katexHtml(tex, display) {
+    try { return window.katex ? window.katex.renderToString(tex, { displayMode: display, output: "mathml", throwOnError: false }) : esc(tex); }
+    catch (e) { return "<code>" + esc(tex) + "</code>"; }
+  }
+  if (window.marked) {
+    window.marked.use({ gfm: true, breaks: false });
+    window.marked.use(mathExt);
+  }
+  function esc(s) { return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+  function md(src) {
+    const raw = window.marked ? window.marked.parse(String(src || "")) : "<p>" + esc(src).replace(/\n/g, "<br>") + "</p>";
+    const clean = window.DOMPurify ? window.DOMPurify.sanitize(raw, { ADD_TAGS: ["math", "semantics", "annotation", "mrow", "mi", "mo", "mn", "msup", "msub", "mfrac", "msqrt", "mtext", "mspace", "mover", "munder", "msubsup", "mtable", "mtr", "mtd", "mstyle", "menclose", "mpadded", "mroot"] }) : esc(src);
+    const wrap = document.createElement("div");
+    wrap.className = "md";
+    wrap.innerHTML = clean;
+    wrap.querySelectorAll("pre code").forEach((el) => { try { window.hljs && window.hljs.highlightElement(el); } catch (e) {} });
+    wrap.querySelectorAll("table").forEach((t) => { const w = document.createElement("div"); w.className = "table-wrap"; t.replaceWith(w); w.appendChild(t); });
+    wrap.querySelectorAll("a[href]").forEach((a) => { a.target = "_blank"; a.rel = "noopener"; });
+    return wrap;
+  }
+  function svgFigure(svg) {
+    const fig = document.createElement("div");
+    fig.className = "svg-figure";
+    fig.innerHTML = window.DOMPurify ? window.DOMPurify.sanitize(svg, { USE_PROFILES: { svg: true, svgFilters: true } }) : "";
+    return fig;
+  }
+  function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+
+  // ---------- mermaid plan ----------
+  function cssVar(n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+  let mermaidSeq = 0;
+  async function renderPlan(box, source) {
+    if (!window.mermaid) { box.appendChild(el("pre", "", source)); return; }
+    let src = String(source);
+    if (/:::current/.test(src) && !/classDef\s+current/.test(src)) {
+      src += "\n  classDef current fill:" + cssVar("--current") + ",stroke:" + cssVar("--current-ink") + ",color:" + cssVar("--current-ink") + ",stroke-width:2px";
+    }
+    try {
+      window.mermaid.initialize({
+        startOnLoad: false, securityLevel: "strict", theme: "base",
+        fontFamily: cssVar("--font-ui"),
+        themeVariables: {
+          background: cssVar("--sheet"), primaryColor: cssVar("--accent-soft"), primaryTextColor: cssVar("--ink"),
+          primaryBorderColor: cssVar("--accent"), lineColor: cssVar("--muted"), textColor: cssVar("--ink"),
+          fontSize: "14px",
+        },
+      });
+      const { svg } = await window.mermaid.render("plan-" + (++mermaidSeq), src);
+      box.innerHTML = window.DOMPurify ? window.DOMPurify.sanitize(svg, { USE_PROFILES: { svg: true, svgFilters: true }, ADD_TAGS: ["foreignObject"] }) : svg;
+    } catch (e) {
+      box.textContent = "";
+      box.appendChild(el("pre", "", source));
+    }
+  }
+
+  // ---------- render ----------
+  function render() {
+    const s = screen;
+    $("empty") && $("empty").remove();
+    main.textContent = "";
+    if (!s) { main.appendChild(emptyState()); return; }
+
+    $("topic").textContent = s.topic || "Live lesson";
+    const stage = $("stage");
+    if (s.stage) { stage.hidden = false; stage.dataset.stage = s.stage; stage.textContent = s.stage; } else stage.hidden = true;
+    $("heading").textContent = s.heading || "";
+    const p = s.progress;
+    if (p && p.total > 0) { $("progress").hidden = false; $("progress-fill").style.width = Math.min(100, Math.round((p.done / p.total) * 100)) + "%"; }
+    else $("progress").hidden = true;
+    lastUpdated = s.updated_at ? new Date(s.updated_at) : null;
+    tickUpdated();
+
+    if (s.goal) main.appendChild(el("p", "goal", s.goal));
+
+    if (s.plan && s.plan.mermaid) {
+      const d = el("details", "plan");
+      d.open = s.plan.open !== false;
+      d.appendChild(el("summary", "", "Plan"));
+      const g = el("div", "plan-graph");
+      d.appendChild(g);
+      if (s.plan.legend) d.appendChild(el("p", "plan-legend", s.plan.legend));
+      main.appendChild(d);
+      renderPlan(g, s.plan.mermaid);
+    }
+
+    (s.sections || []).forEach((sec) => {
+      const b = el("section", "block");
+      b.dataset.kind = sec.kind || "step";
+      if (sec.label) b.appendChild(el("p", "label", sec.label));
+      if (sec.title) b.appendChild(el("h2", "", sec.title));
+      if (sec.md) b.appendChild(md(sec.md));
+      if (sec.svg) b.appendChild(svgFigure(sec.svg));
+      main.appendChild(b);
+    });
+
+    if (s.check) main.appendChild(renderCheck(s.check));
+
+    if (s.last_result && (s.last_result.md || s.last_result.title)) {
+      const d = el("details", "result");
+      d.open = s.last_result.open !== false;
+      const sum = el("summary");
+      sum.appendChild(el("p", "label", "Last result"));
+      if (s.last_result.title) sum.appendChild(el("h2", "", s.last_result.title));
+      d.appendChild(sum);
+      if (s.last_result.md) d.appendChild(md(s.last_result.md));
+      main.appendChild(d);
+    }
+  }
+
+  function emptyState() {
+    const box = el("div", "empty");
+    box.appendChild(el("h2", "", "Nothing on screen yet"));
+    box.appendChild(el("p", "", "This page shows the step you're on, your check and the last result. Claude rewrites it every turn. Start or continue a lesson in Claude and it fills in here."));
+    return box;
+  }
+
+  function renderCheck(c) {
+    const box = el("section", "check");
+    box.setAttribute("aria-labelledby", "check-title");
+    const head = el("div", "check-head");
+    head.appendChild(el("p", "label", "Your check"));
+    box.appendChild(head);
+    if (c.title) { const h = el("h2", "", c.title); h.id = "check-title"; box.appendChild(h); }
+    if (c.md) box.appendChild(md(c.md));
+    const fields = Array.isArray(c.fields) ? c.fields : [];
+    fields.forEach((f, i) => box.appendChild(renderField(f, i)));
+
+    const foot = el("div", "check-foot");
+    if (fields.length) {
+      const btn = el("button", "done", "I'm done");
+      btn.type = "button"; btn.id = "done-btn";
+      btn.addEventListener("click", markDone);
+      foot.appendChild(btn);
+      const st = el("span", "save-state"); st.id = "save-state"; st.setAttribute("aria-live", "polite");
+      foot.appendChild(st);
+      box.appendChild(foot);
+      showSaveState();
+    } else {
+      box.appendChild(el("p", "chat-note", c.answer_note || "Answer in the chat with Claude, with your reasoning. \"I don't know\" is a fine answer."));
+    }
+    return box;
+  }
+
+  function fieldId(f, i) { return String(f.id || "f" + i); }
+
+  function renderField(f, i) {
+    const id = fieldId(f, i);
+    const wrap = el("div", "field");
+    if (f.type === "table") {
+      if (f.label) wrap.appendChild(el("label", "", f.label));
+      const tw = el("div", "table-wrap");
+      const t = el("table", "fill");
+      const editable = new Set((f.editable || []).map(Number));
+      const thead = el("thead"); const hr = el("tr");
+      (f.columns || []).forEach((col) => hr.appendChild(el("th", "", col)));
+      thead.appendChild(hr); t.appendChild(thead);
+      const tb = el("tbody");
+      const saved = Array.isArray(answers[id]) ? answers[id] : [];
+      (f.rows || []).forEach((row, r) => {
+        const tr = el("tr");
+        (f.columns || []).forEach((col, cIdx) => {
+          if (editable.has(cIdx)) {
+            const td = el("td", "editable");
+            const inp = el("input");
+            inp.type = "text"; inp.id = "ans-" + id + "-" + r + "-" + cIdx;
+            inp.setAttribute("aria-label", (col || "answer") + ", row " + (r + 1));
+            inp.autocomplete = "off"; inp.spellcheck = false;
+            inp.value = (saved[r] && saved[r][cIdx]) || "";
+            inp.addEventListener("input", () => {
+              const grid = Array.isArray(answers[id]) ? answers[id].map((x) => (Array.isArray(x) ? x.slice() : [])) : [];
+              const cols = (f.columns || []).length;
+              while (grid.length < (f.rows || []).length) grid.push([]);
+              for (const rowArr of grid) for (let k = 0; k < cols; k++) if (typeof rowArr[k] !== "string") rowArr[k] = "";
+              grid[r][cIdx] = inp.value;
+              answers[id] = grid;
+              edited();
+            });
+            td.appendChild(inp); tr.appendChild(td);
+          } else {
+            const td = el("td", "given");
+            const cell = md(row[cIdx] || "");
+            const only = cell.children.length === 1 && cell.firstElementChild.tagName === "P";
+            if (only) td.innerHTML = cell.firstElementChild.innerHTML; // already sanitised by md()
+            else td.appendChild(cell);
+            tr.appendChild(td);
+          }
+        });
+        tb.appendChild(tr);
+      });
+      t.appendChild(tb); tw.appendChild(t); wrap.appendChild(tw);
+      return wrap;
+    }
+    const ta = el("textarea", "answer" + (f.type === "code" ? " code" : ""));
+    ta.id = "ans-" + id;
+    const lab = el("label", "", f.label || (f.type === "code" ? "Your code" : "Your answer"));
+    lab.htmlFor = ta.id;
+    wrap.appendChild(lab);
+    ta.rows = Math.max(3, Number(f.lines) || (f.type === "code" ? 12 : 4));
+    ta.spellcheck = f.type !== "code";
+    if (f.placeholder) ta.placeholder = f.placeholder;
+    ta.value = typeof answers[id] === "string" ? answers[id] : (f.starter || "");
+    if (f.type === "code") {
+      ta.addEventListener("keydown", (e) => {
+        if (e.key === "Tab" && !e.shiftKey) { e.preventDefault(); const s = ta.selectionStart; ta.setRangeText("    ", s, ta.selectionEnd, "end"); ta.dispatchEvent(new Event("input")); }
+      });
+    }
+    ta.addEventListener("input", () => { answers[id] = ta.value; edited(); });
+    wrap.appendChild(ta);
+    return wrap;
+  }
+
+  // ---------- answers: saved to answers/<check id>, read by Claude ----------
+  function edited() {
+    answerStatus = "draft";
+    showSaveState("Saving…");
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveAnswers, 700);
+  }
+  async function saveAnswers() {
+    if (!db || !checkId) { showSaveState("Not saved: live sync is off. Paste your answer into the chat.", "error"); return; }
+    if (saving) { saveAgain = true; return; }
+    saving = true;
+    try {
+      await db.doc("answers/" + checkId).set({ check_id: checkId, fields: answers, status: answerStatus, updated_at: new Date().toISOString() });
+      showSaveState();
+    } catch (e) {
+      showSaveState(e && e.code === "invalid_argument" ? "This page is read-only for you." : "Couldn't save. Check your connection; your text is still here.", "error");
+    } finally {
+      saving = false;
+      if (saveAgain) { saveAgain = false; saveAnswers(); }
+    }
+  }
+  async function markDone() {
+    clearTimeout(saveTimer);
+    answerStatus = "done";
+    await saveAnswers();
+  }
+  function showSaveState(text, kind) {
+    const st = $("save-state"); if (!st) return;
+    const btn = $("done-btn");
+    if (text) { st.textContent = text; st.dataset.state = kind || "saving"; return; }
+    if (answerStatus === "done") { st.textContent = "Marked done. Say \"done\" in the chat and Claude will read it."; st.dataset.state = "done"; if (btn) btn.textContent = "Done ✓"; }
+    else { st.textContent = Object.keys(answers).length ? "Saved as you type." : "Type in the fields above; it saves as you go."; st.dataset.state = "idle"; if (btn) btn.textContent = "I'm done"; }
+  }
+
+  async function loadAnswers(id) {
+    answers = {}; answerStatus = "draft";
+    if (!db || !id) return;
+    try {
+      const snap = await db.doc("answers/" + id).get();
+      if (snap.exists) { const d = snap.data() || {}; answers = JSON.parse(JSON.stringify(d.fields || {})); answerStatus = d.status === "done" ? "done" : "draft"; }
+    } catch (e) { /* render with empty fields */ }
+  }
+
+  // ---------- "updated 3 min ago" ----------
+  function tickUpdated() {
+    const u = $("updated");
+    if (!db) { u.dataset.live = "off"; u.textContent = "Live sync off"; return; }
+    u.dataset.live = "on";
+    if (!lastUpdated || isNaN(lastUpdated)) { u.textContent = "Live"; return; }
+    const mins = Math.round((Date.now() - lastUpdated.getTime()) / 60000);
+    u.textContent = mins < 1 ? "Updated just now" : mins < 60 ? "Updated " + mins + " min ago" : "Updated " + lastUpdated.toLocaleString([], { weekday: "short", hour: "numeric", minute: "2-digit" });
+  }
+  setInterval(tickUpdated, 30000);
+
+  // Re-colour the plan when the theme flips.
+  try { window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => screen && render()); } catch (e) {}
+  new MutationObserver(() => screen && render()).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
+  // ---------- boot ----------
+  async function start() {
+    try { db = window.claude && window.claude.use ? await window.claude.use("db") : null; } catch (e) { db = null; }
+    if (!db) {
+      tickUpdated();
+      $("heading").textContent = "Live sync isn't available here";
+      main.textContent = "";
+      const box = emptyState();
+      box.querySelector("p").textContent = "Open this page on claude.ai while signed in to see the current lesson. Claude writes each step here as you go.";
+      main.appendChild(box);
+      return;
+    }
+    tickUpdated();
+    db.doc("live/screen").onSnapshot(async (snap) => {
+      const next = snap.exists ? snap.data() : null;
+      const nextCheck = next && next.check && next.check.id ? String(next.check.id) : null;
+      if (nextCheck !== checkId) { checkId = nextCheck; await loadAnswers(checkId); }
+      // Don't redraw under the learner's cursor for an identical screen.
+      if (screen && next && JSON.stringify(next) === JSON.stringify(screen)) return;
+      const focused = document.activeElement && document.activeElement.id;
+      screen = next;
+      render();
+      if (focused && $(focused) && nextCheck === checkId) { try { $(focused).focus({ preventScroll: true }); } catch (e) {} }
+    }, () => { const u = $("updated"); u.dataset.live = "off"; u.textContent = "Live sync stopped. Reload the page."; });
+  }
+  start();
+})();
+</script>

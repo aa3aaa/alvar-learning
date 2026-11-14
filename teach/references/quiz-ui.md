@@ -8,7 +8,7 @@ If more than one of these tools exists, pick the first match in the table.
 
 | If you have this tool | Harness | Call it |
 |-----------------------|---------|---------|
-| `mcp__alvar_quiz__ask_user_question` (or the `ask_user_question` tool from server `alvar_quiz`) | **Codex desktop** with its configured picker (native or Obsidian) | that MCP tool |
+| `mcp__alvar_quiz__ask_user_question` (or the `ask_user_question` tool from server `alvar_quiz`) | **Codex desktop** with its configured picker | that MCP tool |
 | `ask_user_question` | **Grok Build** or **Codex** | `ask_user_question` |
 | `AskUserQuestion` | **Claude Code** | `AskUserQuestion` |
 | `question` | **OpenCode** | `question` |
@@ -67,19 +67,15 @@ Tool constraints that shape the quiz:
 
 Where the stem and choices go:
 
-- **Plain-language question, no display log:** put the full stem in `question` and the full choices in `label` / `description`.
-- **Stem needs a code block or is long:** print the stem (code included) in chat immediately before the call, or write it to the display log. Choices still go only in the picker.
-- **Mathematics that needs typesetting, or `.alvar/LEARNER.md` names a display log:** use the display-log split below.
+- **Plain-language question, no live lesson page:** put the full stem in `question` and the full choices in `label` / `description`.
+- **Stem needs a code block or is long:** put the stem (code included) on the live lesson page, or print it in chat immediately before the call. Choices still go only in the picker.
+- **Mathematics that needs typesetting, or `.alvar/LEARNER.md` names a live lesson page:** use the page split below.
 
-### Markdown-log diagnostic display with answers in Claude Code
+### Questions on the live lesson page, answers in the picker
 
-Same split as the Codex version further down, with `AskUserQuestion` as the picker:
-
-1. Write the complete question and all choices labelled `A`–`D` to the display log first, with `$...$` / `$$...$$` LaTeX. `D` is always **I don't know**. No answer key or correctness cues.
-2. Call `AskUserQuestion` with the question `Choose the letter shown in the Learning Log (<question number>).` and four options labelled `A`, `B`, `C`, `D`. Because descriptions are required, use the neutral `Option A in the Learning Log`, and for `D` `I don't know`. Do not repeat the stem or choice text.
-3. Wait for the result, grade it, update canonical `.alvar` state, then update the display log with the result and route.
-
-To bring the display log to the front in Obsidian, run `open "obsidian://open?path=<url-encoded absolute path to the log>"`. This selects the right vault as well as the note. If it fails, give the learner the file path; do not claim the note is visibly open.
+1. Write the complete question and all choices labelled `A`–`D` into the page's `check.md` first ([learner-files.md](learner-files.md), "Probes and lock-ins on the page"), with `$...$` / `$$...$$` LaTeX where needed. `D` is always **I don't know**. No answer key or correctness cues.
+2. Call `AskUserQuestion` with the question `Choose the letter shown on the live lesson page (<question number>).` and four options labelled `A`, `B`, `C`, `D`. Because descriptions are required, use the neutral `Option A on the page`, and for `D` `I don't know`. Do not repeat the stem or choice text.
+3. Wait for the result, grade it, update canonical `.alvar` state, then update the page with the result and route.
 
 ## Codex — `ask_user_question`
 
@@ -100,20 +96,9 @@ questions:
         description: "Skip this strand; do not guess."
 ```
 
-The server opens whichever structured picker its local configuration selects. In `obsidian` mode, it writes an answer-key-free request to the configured vault and waits for the **Alvar Quiz Picker** plugin; that plugin renders Markdown and LaTeX in an Obsidian modal and returns the learner's selection. In native mode, the server uses Codex form elicitation. Both modes return structured `answers` containing `label`, `optionIndex`, and optional `reason`. The server never knows or marks the correct answer. Grade only after the tool returns. A declined or cancelled picker is not a wrong answer.
+The server opens whichever structured picker its local configuration selects and returns structured `answers` containing `label`, `optionIndex`, and optional `reason`. The server never knows or marks the correct answer. Grade only after the tool returns. A declined or cancelled picker is not a wrong answer. If the picker does not respond, say so and ask the learner to check its configuration; do not expose the pending choices in chat and do not silently switch pickers.
 
-If Obsidian mode reports that the picker did not respond, tell the learner to open the configured vault, enable **Alvar Quiz Picker**, and retry. Do not expose the pending choices in chat and do not silently switch picker modes.
-
-### Markdown-log diagnostic display with answers in Codex
-
-If `.alvar/LEARNER.md` says the learner reads a visible Markdown display log but answers diagnostic questions in Codex, use the Codex-native MCP picker and follow this split deliberately:
-
-1. Write the complete question and all choices labelled `A`–`D` to the configured display log before calling the tool. Render every mathematical expression with `$...$` or `$$...$$` and proper LaTeX commands. `D` is always **I don't know**.
-2. Keep the display unbiased: no answer key, recommendation, correctness styling, or right-answer-first ordering.
-3. Call the Codex picker with the exact question `Choose the letter shown in the Obsidian Learning Log.` and exactly four options whose labels are `A`, `B`, `C`, and `D`. Omit every option description. Do not repeat the stem, formulas, or choice text in the picker.
-4. Wait for the native picker result, grade it, update canonical `.alvar` state, and then update the display log with the result and route.
-
-Do not open the Obsidian quiz bridge in this mode. Obsidian is the rendered lesson surface; Codex is the interaction surface.
+When the learner reads a live lesson page, put the question and choices on the page first and give the picker letters only, exactly as in the Claude Code split above (Codex: omit option descriptions).
 
 If the server is configured but the tool is absent, tell the learner to start a new Codex task or restart Codex so MCP discovery runs again. Do not substitute `request_user_input`: its recommendation semantics can leak or bias a graded answer.
 

@@ -5,11 +5,11 @@ My version of the **Alvar-method tutoring skills** for coding agents (Claude Cod
 The method is **Eero Alvar's**, from his video [*How I Use AI to Learn Things*](https://youtu.be/kzcI5F4tGiU). This repo is copied from [samueltlai/teach](https://github.com/samueltlai/teach), whose skill files started as [vasanthsreeram/Alvarmethod](https://github.com/vasanthsreeram/Alvarmethod) (MIT). See [Credits](#credits) for exactly what came from where. Changes over the original:
 
 - free-response lock-ins after each teaching step (diagnostic probes stay multiple choice)
-- a visible Markdown display log (Obsidian) mirrored from the canonical `.alvar/` state
+- a visible lesson surface mirrored from the canonical `.alvar/` state (originally an Obsidian note; now a live claude.ai page)
 - `~/.alvar/roots.md` index of learner roots, so sessions resume from any starting directory
 - harness-neutral wording so the same files work in Claude Code and Codex
 - **active recall**: every locked step becomes a spaced-repetition card, and returning to a course folder offers a short recall round when cards are due (new in this repo)
-- **a live Learning Log**: the Obsidian note shows only the current step and your last result in full, with the complete record in a per-session archive (new in this repo)
+- **a live lesson page**: one claude.ai artifact per topic that Claude rewrites every turn to show only the current step, your check (with boxes to type answers into) and your last result in full (new in this repo)
 
 ## Skills
 
@@ -83,9 +83,11 @@ Start a new Claude Code session afterwards. To see what it would do in a course 
 
 **3. Set up a course folder.** Open your agent in (or point it at) the folder for one course, put the lecture slides there, and run `/learn-profile`. It writes `.alvar/LEARNER.md` and adds the folder to `~/.alvar/roots.md`, so later sessions find it from any directory. Tell the profile where the slides are; `teach` treats them as the source of truth.
 
-**4. Obsidian (optional, recommended).** Open the course folder as an Obsidian vault. When `/learn-profile` asks where you read, say Obsidian: it creates `<Course> Learning Log.md` and sets it as the display log. Lessons, plans (mermaid) and checks (LaTeX) then appear there, rendered, while you answer in the agent chat. Diagrams are copied into a `visuals/` folder beside the log, because Obsidian ignores `.alvar/`.
+**4. Live lesson page (optional, recommended).** When `/learn-profile` asks how you want to read lessons, choose the live lesson page. It publishes [`teach/assets/live-lesson.html`](teach/assets/live-lesson.html) as a private claude.ai artifact, `<Course> Live Lesson`, and records its link in `.alvar/LEARNER.md`.
 
-The Learning Log is a **live note**: it is rewritten every turn to show only the current step (plan, explanation, your check) and the full result of your last check (the question, your answer, the grade and the correction), so you never have to scroll to the bottom of a growing log. The full record of each session is appended to a separate archive note, `Learning Log/<date> <topic>.md` (recall rounds go to `Learning Log/<date> Recall.md`), for when you want to look back. Set `Display archive: none` in `.alvar/LEARNER.md` to turn the archive off. A Learning Log written under the old append-everything layout is moved, unchanged, to `Learning Log/<date> Earlier log.md` the first time.
+The page is a screen, not a log. Every turn Claude rewrites it to show only the current step (plan with the current node highlighted, the explanation, any side question), **your check**, and the **full result of your last check** (the question, your answer, the grade and the correction). It updates live while it's open, so there's nothing to scroll back through. Where an answer is a table, blanks or code, the check has boxes you type into; they save as you go, and when you say "done" Claude reads them from the page. Code is highlighted, `$...$` maths renders, and diagrams appear inline. The full record stays in `.alvar/` (session logs, maps, `recall-log.md`); there is no separate archive.
+
+The page needs a harness with the `Artifact` and `ArtifactData` tools (claude.ai and the Claude apps). In a terminal-only harness, lessons stay in the chat.
 
 **5. Settings (optional).** Create `~/.alvar/settings.md` to change the helper agents or recall, for example:
 
@@ -108,6 +110,6 @@ recall_day_ceiling: 12 # ...or the new study day starts at this hour anyway
 - **Eero Alvar's own system, [amosblomqvist/learn](https://github.com/amosblomqvist/learn)** — the source of two ideas here: the **discovery style** (unconditional truths first, then "how could I have discovered this?") and **handing research and diagrams to subagents**, which the helper agents follow. That repo has no licence, so nothing from it is copied: `discovery.md` and `agents.md` are fresh write-ups of the ideas.
 - **Vasanth Sreeram, [vasanthsreeram/Alvarmethod](https://github.com/vasanthsreeram/Alvarmethod)** — the original portable `SKILL.md` implementation (`teach`, `probe`, `learn-profile`, `learn-verify`, `learn-visual`) that these files started from, used under the MIT licence; its notice is in [LICENSE](LICENSE).
 - **Samuel Lai, [samueltlai/teach](https://github.com/samueltlai/teach)** — the version this repo is copied from, with its history: free-response lock-ins, the Obsidian display log, the roots index, the helper agents and the discovery style.
-- **Active recall** (the `recall` skill, `teach/references/recall.md` and `hooks/`) and the **live Learning Log with an archive** are new in this repo.
+- **Active recall** (the `recall` skill, `teach/references/recall.md` and `hooks/`) and the **live lesson page** (`teach/assets/live-lesson.html`) are new in this repo.
 
 Thanks to all of them. If you like this, go watch the video and star their repos.
