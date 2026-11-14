@@ -203,6 +203,28 @@ textarea.answer, table.fill input {
 }
 textarea.answer { padding: 10px 12px; resize: vertical; line-height: 1.55; min-height: 88px; font-size: 16px; }
 textarea.answer.code { font-family: var(--font-code); font-size: 13.5px; line-height: 1.6; tab-size: 4; white-space: pre; overflow-x: auto; background: var(--code-bg); }
+/* Code answers: a highlighted copy sits under a transparent textarea, so you type in colour. */
+.code-editor {
+  position: relative; border: 1px solid var(--field-line); border-radius: 8px; background: var(--code-bg);
+  overflow: hidden; transition: border-color .15s, box-shadow .15s;
+}
+.code-editor:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent); }
+.code-editor pre.code-hl, .code-editor textarea.answer.code {
+  margin: 0; padding: 12px 14px; border: 0; border-radius: 0;
+  font-family: var(--font-code); font-size: 13.5px; line-height: 1.6; letter-spacing: 0; font-variant-ligatures: none;
+  tab-size: 4; white-space: pre; word-wrap: normal; overflow-wrap: normal;
+}
+.code-editor pre.code-hl {
+  position: absolute; inset: 0; overflow: hidden; pointer-events: none; color: var(--ink); background: transparent;
+}
+.code-editor pre.code-hl code { font: inherit; background: none; padding: 0; }
+.code-editor textarea.answer.code {
+  position: relative; display: block; width: 100%; background: transparent; color: transparent;
+  -webkit-text-fill-color: transparent; caret-color: var(--ink); overflow: auto; box-shadow: none;
+}
+.code-editor textarea.answer.code:focus-visible { outline: none; box-shadow: none; }
+.code-editor textarea.answer.code::placeholder { color: var(--muted); -webkit-text-fill-color: var(--muted); }
+.code-editor textarea.answer.code::selection { background: color-mix(in srgb, var(--accent) 30%, transparent); }
 table.fill { width: 100%; }
 table.fill td.editable { padding: 0; background: var(--field-bg); }
 table.fill input { border: 0; border-radius: 0; padding: 9px 12px; font-size: 15px; background: transparent; }
@@ -502,6 +524,28 @@ details.result .md { margin-top: 16px; }
       });
     }
     ta.addEventListener("input", () => { answers[id] = ta.value; edited(); });
+    if (f.type === "code") {
+      const lang = String(f.lang || "java").toLowerCase();
+      const ed = el("div", "code-editor");
+      const pre = el("pre", "code-hl"); pre.setAttribute("aria-hidden", "true");
+      const code = el("code", "hljs language-" + lang);
+      pre.appendChild(code);
+      const paint = () => {
+        const v = ta.value + (ta.value.endsWith("\n") || !ta.value ? " " : "");
+        let html = null;
+        try {
+          if (window.hljs) html = window.hljs.getLanguage(lang) ? window.hljs.highlight(v, { language: lang, ignoreIllegals: true }).value : window.hljs.highlightAuto(v).value;
+        } catch (e) { html = null; }
+        if (html == null) code.textContent = v; else code.innerHTML = html; // hljs output is escaped
+        pre.scrollTop = ta.scrollTop; pre.scrollLeft = ta.scrollLeft;
+      };
+      ta.addEventListener("input", paint);
+      ta.addEventListener("scroll", () => { pre.scrollTop = ta.scrollTop; pre.scrollLeft = ta.scrollLeft; });
+      ed.appendChild(pre); ed.appendChild(ta);
+      wrap.appendChild(ed);
+      paint();
+      return wrap;
+    }
     wrap.appendChild(ta);
     return wrap;
   }
