@@ -14,7 +14,7 @@ Every node in the plan gets one tag.
 | **discover** | A result that feels arbitrary if just stated: a derivation, the choice of a formula, a design pattern, an algorithm's design. | `D1{{...}}` |
 | **step** | Everything else: notation, syntax, terminology, applying a method already locked. The default. | `S1[...]` |
 
-Show a one-line legend under the diagram in the display log.
+Show a one-line legend under the diagram (on the live lesson page, `plan.legend`).
 
 ## Tagging at plan time
 

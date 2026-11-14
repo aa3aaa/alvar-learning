@@ -17,7 +17,7 @@ metadata:
 
 Measure first. Do not teach during a probe except a one-line correction after they answer.
 
-Before the first question, read [../teach/references/learner-files.md](../teach/references/learner-files.md) and `.alvar/LEARNER.md` if it exists. Honor any configured visible Markdown display log, including synchronizing the complete LaTeX-formatted pending check before opening the picker.
+Before the first question, read [../teach/references/learner-files.md](../teach/references/learner-files.md) and `.alvar/LEARNER.md` if it exists. If `LEARNER.md` names a live lesson page, put the complete pending question (LaTeX where needed) on the page before opening the picker.
 
 If the probe covers a source deck, draw question content from its prep notes (`.alvar/prep/`), running the Prep agent first if they are missing; see [../teach/references/agents.md](../teach/references/agents.md).
 

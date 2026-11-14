@@ -20,13 +20,13 @@ One idea, one picture. The picture exists so the learner can accept the step —
 
 Write `.alvar/visuals/<slug>-<n>.svg` (create the folder). Embed or link it in the session file.
 
-If the learner reads an Obsidian display log, also copy the finished file to a `visuals/` folder beside the display log and embed that copy (`![[<slug>-<n>.svg]]`): Obsidian does not index dot-folders such as `.alvar/`.
+Keep the SVG self-contained (no external images, fonts or scripts; text as `<text>`), because the tutor pastes its markup into the live lesson page, which cannot load local files.
 
 Prefer SVG. Use another format only if the harness cannot preview SVG.
 
 ## As the Visual agent
 
-When `teach` starts you as its Visual agent (see [../teach/references/agents.md](../teach/references/agents.md)), the brief gives the one claim, the labels in course notation, and the output paths. Run the loop below in full. Do not write the display log or session file. Return the file path(s) and one line saying what the learner should look at first.
+When `teach` starts you as its Visual agent (see [../teach/references/agents.md](../teach/references/agents.md)), the brief gives the one claim, the labels in course notation, and the output paths. Run the loop below in full. Do not write the live lesson page or session file. Return the file path(s) and one line saying what the learner should look at first.
 
 ## Loop (do not skip)
 
