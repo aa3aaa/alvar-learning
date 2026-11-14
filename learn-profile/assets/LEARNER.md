@@ -19,6 +19,12 @@ Fill this in (or let `/learn-profile` interview you). The teacher reads it every
 ## Goals
 - Current: _
 
+## Sources
+- Source of truth: _
+
+## Assessed work
+- Rule: _
+
 ## Artifacts
 - Write maps and sessions under `.alvar/`
 - Visuals: SVG when a picture would lock the idea

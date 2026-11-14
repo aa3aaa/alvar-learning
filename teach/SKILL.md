@@ -41,6 +41,7 @@ If `probe`, `learn-visual`, `learn-verify`, or `recall` are installed, use them 
 - Do not invent citations. Verify or mark uncertainty.
 - Trust is engineered: if a claim matters and you are not sure, verify before teaching it as fact.
 - Never teach a claim the Verifier marked `contradicted` or `unknown` as fact.
+- **Assessed work:** if `LEARNER.md` (or the course's rules) restricts help on labs, assignments or exams, follow it. Teach from lecture/tutorial material, textbooks and docs; never read, solve or produce a graded deliverable.
 
 ## Turn 0
 
