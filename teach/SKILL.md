@@ -27,7 +27,8 @@ Read, in order, before the first question:
 6. [references/agents.md](references/agents.md) — **the helper agents** (Prep, Verifier, Visual, Scribe): when each runs, its brief, and the inline fallback.
 7. [references/discovery.md](references/discovery.md) — **the discovery style**: tagging nodes `truth` / `discover` / `step`, and switching a node to discovery when the learner is confused.
 8. [references/recall.md](references/recall.md) — **active recall**: a card for every locked node, and a recall round offered when cards are due.
-9. `.alvar/LEARNER.md` if it exists (else offer `learn-profile` or write a stub from [assets/LEARNER.md](assets/LEARNER.md) after 3–5 questions)
+9. [references/mastery.md](references/mastery.md) — **mastery**: a node is finished only on one clean, unaided answer; after a miss the learner fixes the answer in place, then answers a fresh question.
+10. `.alvar/LEARNER.md` if it exists (else offer `learn-profile` or write a stub from [assets/LEARNER.md](assets/LEARNER.md) after 3–5 questions)
 
 If `probe`, `learn-visual`, `learn-verify`, or `recall` are installed, use them for those jobs. If not, follow the same protocols inline. Prep, verification, diagrams and session summaries run as separate agents when the harness can start them; see agents.md.
 
@@ -35,7 +36,7 @@ If `probe`, `learn-visual`, `learn-verify`, or `recall` are installed, use them 
 
 - Struggle stays in the material. You absorb logistics.
 - Do not reteach `known`. Do not start in `unknown` with no ramp.
-- One reasoning step per turn. Stop. Ask one constructed-response lock-in for that step. Advance only on lock-in.
+- One reasoning step per turn. Stop. Ask one constructed-response lock-in for that step. Advance only on mastery (mastery.md): a clean answer, never a corrected one.
 - Show the mermaid plan **before** teaching. Do not skip the graph.
 - Never dump the whole explanation in one message.
 - Do not invent citations. Verify or mark uncertainty.
@@ -46,7 +47,7 @@ If `probe`, `learn-visual`, `learn-verify`, or `recall` are installed, use them 
 ## Turn 0
 
 1. Restate the goal in one sentence. Confirm.
-2. Load or create learner files. If resuming, read the session's `## Resume here` block (run Scribe first if it is missing or stale).
+2. Load or create learner files. If resuming, read the session's `## Resume here` block (run Scribe first if it is missing or stale). A node recorded `not mastered` comes back before any new node (mastery.md).
 3. **Recall check.** If context reports "Active recall status" with cards due, or the hook is not watching this root and `.alvar/recall.md` has cards due today (see "Without the hook" in recall.md), offer a round first ([references/recall.md](references/recall.md), "Offering a round"). After the round, "Not now" or "Skip today", carry on with the goal.
 4. If the plan will draw on a source deck with no fresh prep notes, start **Prep**.
 5. Probe (or reuse a map for this exact goal if it is fresh and the user agrees).
@@ -59,7 +60,7 @@ During the initial probe, call the harness quiz UI in [references/quiz-ui.md](re
 
 After teaching a node, follow [references/lock-in-response.md](references/lock-in-response.md): put one unbiased free-response prompt on the live lesson page if `LEARNER.md` names one (with fill-in fields where the answer is a table, blanks or code), otherwise in the chat; invite the learner to answer, and stop. Do not open a multiple-choice picker for a teaching lock-in.
 
-When the learner replies, grade the method and justification, update the map and session file, and then choose the next node, a retry, or an inserted prerequisite. When a node locks in, add its recall card to `.alvar/recall.md` ([references/recall.md](references/recall.md), "Making cards").
+When the learner replies, grade the method and justification, update the map and session file, and then choose the next node, a retry (fix in place, then a fresh mastery question; [references/mastery.md](references/mastery.md)), or an inserted prerequisite. When a node is mastered, add its recall card to `.alvar/recall.md` ([references/recall.md](references/recall.md), "Making cards").
 
 If recall becomes due mid-session (the hook reports "Active recall status" with a prompt), finish grading any answer the learner just gave, then make the offer before the next node.
 

@@ -53,7 +53,7 @@ Written by the hook ([hooks/recall-check.js](../../hooks/recall-check.js)) on se
 
 ## Making cards
 
-- **When a lock-in passes**, add one card for that node: box `1`, `last` = study day, `due` = study day + 1, history `MM-DD L`. A node that taught two separable ideas may get two cards; never more.
+- **When a node is mastered** ([mastery.md](mastery.md)), add one card for that node: box `1`, `last` = study day, `due` = study day + 1, history `MM-DD L`. A node that taught two separable ideas may get two cards; never more.
 - **When a node ends taught-not-verified** (the learner asked to skip), add its card the same way. It is the card most likely to need the review.
 - `truth` nodes get a `concept` card; `discover` nodes get a card on the decisive move (`concept` or `method`); `step` nodes take whatever kind fits.
 - Write the `idea` from what was actually taught and verified, in the course's notation. Never put a claim the Verifier marked `contradicted` or `unknown` on a card.
@@ -62,7 +62,7 @@ Written by the hook ([hooks/recall-check.js](../../hooks/recall-check.js)) on se
 
 ### Building the deck from earlier sessions
 
-On "build my recall deck" (or the first recall run in a root that has sessions but no deck): read every `.alvar/sessions/*.md` `## Log`, and card each node whose `result` is `lock-in` or that is marked taught-not-verified, skipping nodes already in the deck (match on `source`). Stagger the new cards' `due` dates, oldest sessions first, so no more than `recall_max` fall on one day. Show the learner the new rows before writing them.
+On "build my recall deck" (or the first recall run in a root that has sessions but no deck): read every `.alvar/sessions/*.md` `## Log`, and card each node whose `result` is `mastered` (or `lock-in`, in logs from before the mastery rule) or that is marked taught-not-verified, skipping nodes already in the deck (match on `source`). Stagger the new cards' `due` dates, oldest sessions first, so no more than `recall_max` fall on one day. Show the learner the new rows before writing them.
 
 ## The schedule (Leitner boxes)
 
