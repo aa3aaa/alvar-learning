@@ -1,6 +1,6 @@
 # Discovery style
 
-Some ideas only stick once the learner sees why they have to be that way. Stated bare, they feel arbitrary, and an arbitrary-feeling fact is held loosely and forgotten. For those nodes, change **how the step is delivered**. The loop does not change: one node per turn, one constructed-response lock-in, advance only on lock-in.
+Some ideas only stick once the learner sees why they have to be that way. Stated bare, they feel arbitrary, and an arbitrary-feeling fact is held loosely and forgotten. For those nodes, change **how the step is delivered**. The loop does not change: one node per turn, one constructed-response lock-in, advance only on mastery ([mastery.md](mastery.md)).
 
 The idea comes from the discovery method in Eero Alvar's video and its creator's own setup; this file is a fresh write-up of it.
 

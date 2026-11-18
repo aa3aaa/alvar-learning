@@ -31,7 +31,7 @@ Grade the method, result, conditions, and explanation—not writing polish.
 
 | evidence | result | route |
 |---|---|---|
-| correct decisive step, result, and sound reason | `lock-in` | advance |
+| correct decisive step, result, and sound reason | `lock-in` | if this is the first answer to this question and no hint was given: `mastered`, advance. If it follows feedback on this question: the fix is done, now set the mastery question ([mastery.md](mastery.md)) |
 | correct result but missing or unsupported reasoning | `retry` / `edge` | ask for the decisive step |
 | sound method with a local algebra or arithmetic slip | `retry` / `edge` | identify only the slip, then give a parallel check |
 | right answer for a surface reason (rote matching) | `retry` / `edge` | switch the node to discovery ([discovery.md](discovery.md)) |
@@ -44,7 +44,7 @@ Give the verdict first, identify the exact working step that succeeds or fails, 
 ### Unanswered and skipped parts
 
 - If the learner leaves part of a check unanswered, ask that part again, without revealing its answer, until they answer it. Do not move on.
-- Reveal and move on only when they explicitly ask to skip ("skip this", "just tell me", "can we skip this calculation"). Honour that without arguing, and record the node as taught-not-verified.
+- Reveal and move on only when they explicitly ask to skip ("skip this", "just tell me", "can we skip this calculation"). Honour that without arguing, and record the node as taught-not-verified and `not mastered` ([mastery.md](mastery.md), "Skipping").
 - Correcting a wrong answer is teaching, not skipping; it does not need permission.
 
 ## Persist and continue
@@ -54,6 +54,7 @@ Record in `.alvar/sessions/<date>-<slug>.md`:
 - lock-in prompt
 - learner response (verbatim when short; otherwise a faithful concise record)
 - grading evidence
-- result: `lock-in` | `retry` | `insert-prereq`
+- which question this was: `first question` | `fix` | `mastery question <k>`
+- result: `mastered` | `retry` | `insert-prereq` | `not mastered (skipped)`
 
-Update the topic map with the resulting `known`, `edge`, `unknown`, or `blocked` evidence. When the result is `lock-in`, or the node ends taught-not-verified, add the node's card to `.alvar/recall.md` ([recall.md](recall.md), "Making cards"). Then update the live lesson page with the concise verdict, correction if needed, and next route before teaching anything else.
+Update the topic map with the resulting `known`, `edge`, `unknown`, or `blocked` evidence. When the result is `mastered`, or the node ends taught-not-verified, add the node's card to `.alvar/recall.md` ([recall.md](recall.md), "Making cards"). Then update the live lesson page with the concise verdict, correction if needed, and next route before teaching anything else.

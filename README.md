@@ -5,6 +5,7 @@ My version of the **Alvar-method tutoring skills** for coding agents (Claude Cod
 The method is **Eero Alvar's**, from his video [*How I Use AI to Learn Things*](https://youtu.be/kzcI5F4tGiU). This repo is copied from [samueltlai/teach](https://github.com/samueltlai/teach), whose skill files started as [vasanthsreeram/Alvarmethod](https://github.com/vasanthsreeram/Alvarmethod) (MIT). See [Credits](#credits) for exactly what came from where. Changes over the original:
 
 - free-response lock-ins after each teaching step (diagnostic probes stay multiple choice)
+- **mastery learning**: a step is finished only on one clean, unaided answer; after a miss you fix your answer, then answer a fresh question (new in this repo)
 - a visible lesson surface mirrored from the canonical `.alvar/` state (originally an Obsidian note; now a live claude.ai page)
 - `~/.alvar/roots.md` index of learner roots, so sessions resume from any starting directory
 - harness-neutral wording so the same files work in Claude Code and Codex
@@ -21,6 +22,10 @@ The method is **Eero Alvar's**, from his video [*How I Use AI to Learn Things*](
 | `learn-verify` | fact-check a claim before it is taught |
 | `learn-visual` | one SVG per idea, viewed and fixed before use |
 | `recall` | spaced-repetition round: fresh free-response questions on the cards that are due |
+
+## Mastery
+
+`teach` does not move to the next step until you have shown mastery of the current one: **one clean answer**, with the decisive step, result and reason all correct, and no hint or correction given on that question. A clean first answer is enough. After a miss the tutor gives feedback, you fix the same answer in place, and then it offers a **fresh question** on the same idea; only a clean answer to a fresh question counts. There is no "locked in with corrections". The only way past a step is to say "skip": it is recorded as not mastered and comes back first next session. Slips in something the step does not test (a typo, a missing bracket) are pointed out and do not block. Mastery applies to lesson steps; probes and recall rounds keep their own rules. Full rules: [`teach/references/mastery.md`](teach/references/mastery.md).
 
 ## Active recall
 

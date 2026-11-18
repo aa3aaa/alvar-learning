@@ -98,7 +98,8 @@ graph TD
 - lock-in prompt:
 - learner response:
 - grading evidence:
-- result: lock-in | retry | insert-prereq
+- attempts: first question | fix | mastery question <k>
+- result: mastered | retry | insert-prereq | not mastered (skipped)
 ```
 
 Keep these files updated as you go. They are the persistence layer, and the only record: the live lesson page shows just the current screen.

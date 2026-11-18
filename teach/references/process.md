@@ -41,11 +41,11 @@ Walk the DAG. One node per turn.
 - If an inserted node or a side-question answer adds a claim beyond the source, send it to the **Verifier** and mark it "(being checked)" until the verdict is back. In lite mode, queue it instead of sending it at once; with the Verifier off, mark it *beyond the source*.
 - After the step, ask one constructed-response lock-in from [lock-in-response.md](lock-in-response.md). Require the learner to generate the decisive move rather than recognize it from choices. Three reasons: they cannot gaslight themselves; you stay calibrated; applying and explaining the idea is how it locks in.
 - Deliver each node in its tagged style: truth plainly, discover as a motivated path from a concrete problem, step as usual ([discovery.md](discovery.md)).
-- Advance only on lock-in. Fail → stay, or insert a prerequisite node. Confusion or a rote retry → switch the node to discovery ([discovery.md](discovery.md)).
+- Advance only on mastery ([mastery.md](mastery.md)): one clean answer, never a corrected one. Fail → stay, or insert a prerequisite node. Confusion or a rote retry → switch the node to discovery ([discovery.md](discovery.md)).
 - Accept questions mid-step. Do not "finish the lesson" over them.
 - Give them things they can accept at face value only after the step they rest on is locked.
 - Persist what happened in the session file.
-- Each node that locks in becomes an active-recall card, so it comes back on a spaced schedule ([recall.md](recall.md)).
+- Each node that is mastered becomes an active-recall card, so it comes back on a spaced schedule ([recall.md](recall.md)).
 
 ## Feedback rules
 
