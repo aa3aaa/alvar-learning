@@ -1,4 +1,4 @@
-# obsidian-method
+# alvar-learning
 
 My version of the **Alvar-method tutoring skills** for coding agents (Claude Code, Codex and others that read `SKILL.md` folders), with **active recall** added.
 
@@ -66,23 +66,23 @@ Learner state (maps, sessions, logs) lives in each course folder's `.alvar/`, ne
 **1. Install the skills.** Clone this repo and link each skill into your agent's skills folder:
 
 ```bash
-git clone https://github.com/aa3aaa/obsidian-method.git ~/src/obsidian-method
+git clone https://github.com/aa3aaa/alvar-learning.git ~/src/alvar-learning
 mkdir -p ~/.claude/skills ~/.agents/skills
 for s in teach probe learn-profile learn-verify learn-visual recall; do
-  ln -s ~/src/obsidian-method/$s ~/.claude/skills/$s   # Claude Code
-  ln -s ~/src/obsidian-method/$s ~/.agents/skills/$s   # Codex and other agents that read ~/.agents/skills
+  ln -s ~/src/alvar-learning/$s ~/.claude/skills/$s   # Claude Code
+  ln -s ~/src/alvar-learning/$s ~/.agents/skills/$s   # Codex and other agents that read ~/.agents/skills
 done
 ```
 
-Other agents: link into wherever they look for `SKILL.md` folders. Update later with `git -C ~/src/obsidian-method pull`.
+Other agents: link into wherever they look for `SKILL.md` folders. Update later with `git -C ~/src/alvar-learning pull`.
 
 **1b. Install the recall hook (Claude Code).** This adds the automatic recall offer to `~/.claude/settings.json`, keeping everything else in it and backing up the old file first:
 
 ```bash
-node ~/src/obsidian-method/hooks/install.js            # --dry-run to preview, --uninstall to remove
+node ~/src/alvar-learning/hooks/install.js            # --dry-run to preview, --uninstall to remove
 ```
 
-Start a new Claude Code session afterwards. To see what it would do in a course folder: `node ~/src/obsidian-method/hooks/recall-check.js --status`. Tests: `node --test ~/src/obsidian-method/hooks/test/*.test.js`.
+Start a new Claude Code session afterwards. To see what it would do in a course folder: `node ~/src/alvar-learning/hooks/recall-check.js --status`. Tests: `node --test ~/src/alvar-learning/hooks/test/*.test.js`.
 
 **2. Install Poppler** so lecture PDFs can be read page by page (Prep depends on it): `brew install poppler` on macOS, `apt install poppler-utils` on Debian/Ubuntu.
 
